@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-APP_DIR="$ROOT/build/Nadir.app"
+APP_DIR="$ROOT/build/Lantern.app"
 BIN_DIR="$APP_DIR/Contents/MacOS"
 RES_DIR="$APP_DIR/Contents/Resources"
 SDK_PATH="$(xcrun --show-sdk-path --sdk macosx)"
@@ -20,6 +20,8 @@ case "$MACHINE_ARCH" in
 esac
 
 mkdir -p "$BIN_DIR" "$RES_DIR"
+export CLANG_MODULE_CACHE_PATH="$ROOT/build/ModuleCache"
+export SWIFT_MODULECACHE_PATH="$ROOT/build/ModuleCache"
 cp "$ROOT/Resources/Info.plist" "$APP_DIR/Contents/Info.plist"
 if [ -f "$ROOT/Assets/AppIcon.icns" ]; then
   cp "$ROOT/Assets/AppIcon.icns" "$ICON_FILE"
@@ -32,8 +34,8 @@ swiftc \
   -sdk "$SDK_PATH" \
   -target "$MACHINE_ARCH-apple-macosx15.0" \
   -parse-as-library \
-  -o "$BIN_DIR/Nadir" \
-  "$ROOT/Sources/LocalChatMac.swift"
+  -o "$BIN_DIR/Lantern" \
+  "$ROOT"/Sources/*.swift
 
 codesign --force --deep --sign - "$APP_DIR"
 

@@ -6,12 +6,13 @@ from typing import Any
 from uuid import uuid4
 
 import chromadb
+from chromadb.config import Settings
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from sentence_transformers import SentenceTransformer
 
 
-APP_SUPPORT_DIR = Path.home() / "Library" / "Application Support" / "GemmaAssistant" / "memory"
+APP_SUPPORT_DIR = Path.home() / "Library" / "Application Support" / "Lantern" / "memory"
 COLLECTION_NAME = "conversation_memory"
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 
@@ -52,7 +53,10 @@ class MoveConversationRequest(BaseModel):
 class MemoryService:
     def __init__(self) -> None:
         APP_SUPPORT_DIR.mkdir(parents=True, exist_ok=True)
-        self.client = chromadb.PersistentClient(path=str(APP_SUPPORT_DIR / "chroma"))
+        self.client = chromadb.PersistentClient(
+            path=str(APP_SUPPORT_DIR / "chroma"),
+            settings=Settings(anonymized_telemetry=False),
+        )
         self.collection = self.client.get_or_create_collection(name=COLLECTION_NAME)
         self.embedder = SentenceTransformer(EMBEDDING_MODEL_NAME)
 
@@ -86,14 +90,32 @@ class MemoryService:
         return {"id": memory_id, "timestamp": timestamp}
 
     def search(self, query: str, top_k: int, project_id: str) -> list[SearchResult]:
-        embedding = self._embed(query)
-        available = self.collection.count()
+        # Scope candidates before nearest-neighbor retrieval. Filtering a global
+        # top-k afterwards lets other projects crowd out relevant local memories.
+        if project_id == "__global__":
+            # Pre-project memories have no project_id and historically belong to
+            # the global workspace. Select those IDs alongside explicit globals
+            # rather than dropping them or exposing another project's records.
+            scoped = self.collection.get(include=["metadatas"])
+            candidate_ids = [
+                memory_id
+                for memory_id, metadata in zip(scoped.get("ids", []), scoped.get("metadatas", []))
+                if str((metadata or {}).get("project_id", "__global__")) == project_id
+            ]
+            query_scope = {"ids": candidate_ids}
+        else:
+            query_scope = {"where": {"project_id": project_id}}
+            scoped = self.collection.get(where=query_scope["where"], include=[])
+            candidate_ids = scoped.get("ids", [])
+        available = len(candidate_ids)
         if available == 0:
             return []
+        embedding = self._embed(query)
         results = self.collection.query(
             query_embeddings=[embedding],
-            n_results=min(available, max(top_k * 10, top_k)),
+            n_results=min(available, top_k),
             include=["documents", "metadatas", "distances"],
+            **query_scope,
         )
 
         ids = results.get("ids", [[]])[0]
@@ -209,7 +231,7 @@ class MemoryService:
 
 
 memory_service = MemoryService()
-app = FastAPI(title="Gemma Assistant Memory Service")
+app = FastAPI(title="Lantern Memory Service")
 
 
 @app.get("/health")

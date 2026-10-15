@@ -1,4 +1,6 @@
 chromadb==1.0.12
+# Chroma 1.0.12 uses PostHog's positional capture API.
+posthog==5.4.0
 fastapi==0.115.9
 sentence-transformers==5.1.0
 uvicorn==0.35.0

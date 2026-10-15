@@ -1,20 +1,12 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="160" y1="112" x2="864" y2="912" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0F3D3E"/>
-      <stop offset="1" stop-color="#1F7A8C"/>
-    </linearGradient>
-    <linearGradient id="panel" x1="280" y1="240" x2="760" y2="760" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFF7E8"/>
-      <stop offset="1" stop-color="#EDE7DA"/>
-    </linearGradient>
-  </defs>
-  <rect x="92" y="92" width="840" height="840" rx="190" fill="url(#bg)"/>
-  <circle cx="802" cy="238" r="58" fill="#F2C14E" opacity="0.95"/>
-  <path d="M286 286C286 250.654 314.654 222 350 222H674C709.346 222 738 250.654 738 286V566C738 601.346 709.346 630 674 630H488L352 762V630H350C314.654 630 286 601.346 286 566V286Z" fill="url(#panel)"/>
-  <rect x="360" y="340" width="304" height="44" rx="22" fill="#1F7A8C"/>
-  <rect x="360" y="432" width="246" height="44" rx="22" fill="#3B8EA5"/>
-  <rect x="360" y="524" width="180" height="44" rx="22" fill="#74A57F"/>
-  <path d="M676 734C676 688.161 713.161 651 759 651H780C825.839 651 863 688.161 863 734V755C863 800.839 825.839 838 780 838H759C713.161 838 676 800.839 676 755V734Z" fill="#F2C14E"/>
-  <path d="M718 746L750 778L820 708" fill="none" stroke="#0F3D3E" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description">
+  <title id="title">Lantern</title>
+  <desc id="description">An emerald circular lantern emblem with a pale green light and geometric top and bottom caps.</desc>
+  <circle cx="512" cy="512" r="420" fill="#066344"/>
+  <circle cx="512" cy="512" r="344" fill="#DDF5DF"/>
+  <g fill="#066344">
+    <circle cx="512" cy="512" r="222"/>
+    <path d="M300 232H724L700 328H324Z"/>
+    <path d="M324 696H700L724 792H300Z"/>
+  </g>
+  <circle cx="512" cy="512" r="140" fill="#DDF5DF"/>
 </svg>
